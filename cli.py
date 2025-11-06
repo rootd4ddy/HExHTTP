@@ -55,7 +55,15 @@ def args() -> argparse.Namespace:
         "-u",
         "--url",
         dest="url",
-        help=f"URL to test {Colors.RED}[required]{Colors.RESET} if no -f/--file provided",
+        help=f"URL to test {Colors.RED}[required]{Colors.RESET} if no -f/--file/--urls provided",
+    )
+    group.add_argument(
+        "-U",
+        "--urls",
+        dest="urls",
+        help="Space-separated list of URLs to test",
+        nargs="+",
+        required=False,
     )
     group.add_argument(
         "-f",
@@ -174,7 +182,7 @@ def args() -> argparse.Namespace:
     args = parser.parse_args()
 
     # Validate that either URL or file is provided
-    if not args.url and not args.url_file:
-        parser.error("Either -u/--url or -f/--file must be provided.")
+    if not args.url and not args.url_file and not args.urls:
+        parser.error("Either -u/--url, -U/--urls, or -f/--file must be provided.")
 
     return args

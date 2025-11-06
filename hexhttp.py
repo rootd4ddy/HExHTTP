@@ -46,6 +46,7 @@ enclosure_queue: Queue[str] = Queue()
 # Global variables for CLI arguments
 human: str | None = None
 url_file: str | None = None
+url_targets: list[str] | None = None
 custom_header: list[str] | None = None
 behavior: bool | None = None
 only_cp: bool | None = None
@@ -136,7 +137,11 @@ def process_modules(url: str, s: requests.Session, a_tech: Technology) -> None:
         print(f"{Colors.BLUE}⟘{Colors.RESET}")
         print(f"{Colors.BLUE}⟙{Colors.RESET}")
 
-        if main_status_code not in [200, 302, 301, 403, 401] and not url_file:
+        if (
+            main_status_code not in [200, 302, 301, 403, 401]
+            and not url_file
+            and not url_targets
+        ):
             choice = input(
                 f" {Colors.YELLOW}The url does not seem to answer correctly, continue anyway ?{Colors.RESET} [y/n]"
             )
@@ -244,10 +249,11 @@ def cli_main() -> None:
     results = args()
 
     # Make variables global so they can be accessed by process_modules
-    global human, url_file, custom_header, behavior, only_cp, threads, authent
+    global human, url_file, url_targets, custom_header, behavior, only_cp, threads, authent
 
     url = results.url
     url_file = results.url_file
+    url_targets = results.urls
     custom_header = results.custom_header
     behavior = results.behavior
     auth = results.auth
@@ -357,6 +363,9 @@ def cli_main() -> None:
                 urls = url_file_handle.read().splitlines()
                 for url in urls:
                     main(url, s, auth)
+        elif url_targets:
+            for target_url in url_targets:
+                main(target_url, s, auth)
         else:
             main(url, s, auth)
         # basic errors
